@@ -124,6 +124,92 @@ def add_modified(tx, commit_id, file_path):
     )
 
 
+def add_import(tx, from_file, to_file, import_name, import_type="module"):
+    """Add an IMPORTS relationship between files."""
+    tx.run(
+        "MERGE (imp:Import {name: $import_name, from_file: $from_file, to_file: $to_file, type: $import_type}) "
+        "WITH imp "
+        "MATCH (f1:File {path: $from_file}) "
+        "MATCH (f2:File {path: $to_file}) "
+        "MERGE (f1)-[:IMPORTS {name: $import_name, type: $import_type}]->(f2) "
+        "MERGE (f1)-[:CONTAINS]->(imp) "
+        "MERGE (imp)-[:REFERENCES]->(f2)",
+        from_file=from_file,
+        to_file=to_file,
+        import_name=import_name,
+        import_type=import_type,
+    )
+
+
+def add_function_call(tx, caller_path, callee_name, caller_file):
+    """Add a CALLS relationship between functions."""
+    tx.run(
+        "MATCH (caller {path: $caller_path}) "
+        "MERGE (call:FunctionCall {caller: $caller_path, callee: $callee_name, file: $caller_file}) "
+        "MERGE (caller)-[:CALLS {function: $callee_name}]->(call)",
+        caller_path=caller_path,
+        callee_name=callee_name,
+        caller_file=caller_file,
+    )
+
+
+def add_inheritance(tx, child_class_path, parent_class_name, file_path):
+    """Add an INHERITS relationship between classes."""
+    tx.run(
+        "MATCH (child:Class {path: $child_class_path}) "
+        "MERGE (parent:Class {name: $parent_class_name, file: $file_path}) "
+        "MERGE (child)-[:INHERITS]->(parent)",
+        child_class_path=child_class_path,
+        parent_class_name=parent_class_name,
+        file_path=file_path,
+    )
+
+
+def add_method(tx, method_name, class_path, file_path):
+    """Add a method node and relationship to its class."""
+    method_path = f"{class_path}::{method_name}"
+    tx.run(
+        "MERGE (method:Method {path: $method_path}) "
+        "SET method.name = $method_name, method.class = $class_path, method.file = $file_path, method.type = 'method' "
+        "WITH method "
+        "MATCH (cls:Class {path: $class_path}) "
+        "MERGE (cls)-[:HAS_METHOD]->(method)",
+        method_path=method_path,
+        method_name=method_name,
+        class_path=class_path,
+        file_path=file_path,
+    )
+
+
+def add_decorator(tx, decorated_path, decorator_name, file_path):
+    """Add a DECORATED_BY relationship."""
+    tx.run(
+        "MATCH (decorated {path: $decorated_path}) "
+        "MERGE (decorator:Decorator {name: $decorator_name, file: $file_path}) "
+        "MERGE (decorated)-[:DECORATED_BY]->(decorator)",
+        decorated_path=decorated_path,
+        decorator_name=decorator_name,
+        file_path=file_path,
+    )
+
+
+def add_variable(tx, var_name, scope_path, file_path, var_type="variable"):
+    """Add a variable node and relationship to its scope."""
+    var_path = f"{scope_path}::{var_name}"
+    tx.run(
+        "MERGE (var:Variable {path: $var_path}) "
+        "SET var.name = $var_name, var.scope = $scope_path, var.file = $file_path, var.type = $var_type "
+        "WITH var "
+        "MATCH (scope {path: $scope_path}) "
+        "MERGE (scope)-[:DEFINES]->(var)",
+        var_path=var_path,
+        var_name=var_name,
+        scope_path=scope_path,
+        file_path=file_path,
+        var_type=var_type,
+    )
+
+
 def fetch_repo_tree(repo_url):
     """Fetch the repository's file tree using GitHub API."""
     response = requests.get(f"{repo_url}/git/trees/main?recursive=1", headers=headers)
@@ -166,24 +252,236 @@ def clone_repo(repo_url, local_path):
 
 
 def parse_python_file(content, file_path, session):
-    """Parse Python file content to extract functions and classes."""
+    """Parse Python file content to extract functions, classes, and all relationships."""
     try:
         tree = ast.parse(content)
+
+        # Track current class context for methods
+        current_class = None
+        current_class_path = None
+
+        # Extract imports first
         for node in ast.walk(tree):
-            if isinstance(node, ast.FunctionDef):
-                session.execute_write(add_function, node.name, file_path)
-                session.execute_write(
-                    add_contains, file_path, f"{file_path}::{node.name}"
-                )
-                print(f"Added function: {node.name} in {file_path}")
-            elif isinstance(node, ast.ClassDef):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    import_name = alias.name
+                    # Try to resolve to file path (basic heuristic)
+                    potential_file = import_name.replace(".", "/") + ".py"
+                    session.execute_write(
+                        add_import, file_path, potential_file, import_name, "module"
+                    )
+                    print(f"Added import: {file_path} -> {import_name}")
+
+            elif isinstance(node, ast.ImportFrom):
+                if node.module:
+                    module_name = node.module
+                    potential_file = module_name.replace(".", "/") + ".py"
+                    for alias in node.names:
+                        import_name = alias.name
+                        session.execute_write(
+                            add_import,
+                            file_path,
+                            potential_file,
+                            f"{module_name}.{import_name}",
+                            "from_import",
+                        )
+                        print(
+                            f"Added from import: {file_path} -> {module_name}.{import_name}"
+                        )
+
+        # Process top-level nodes in order to maintain context
+        for node in tree.body:
+            if isinstance(node, ast.ClassDef):
+                class_path = f"{file_path}::{node.name}"
+                current_class = node.name
+                current_class_path = class_path
+
+                # Add class
                 session.execute_write(add_class, node.name, file_path)
-                session.execute_write(
-                    add_contains, file_path, f"{file_path}::{node.name}"
-                )
+                session.execute_write(add_contains, file_path, class_path)
                 print(f"Added class: {node.name} in {file_path}")
+
+                # Add inheritance relationships
+                for base in node.bases:
+                    if isinstance(base, ast.Name):
+                        parent_name = base.id
+                        session.execute_write(
+                            add_inheritance, class_path, parent_name, file_path
+                        )
+                        print(f"Added inheritance: {node.name} -> {parent_name}")
+                    elif isinstance(base, ast.Attribute):
+                        # Handle module.ClassName inheritance
+                        parent_name = (
+                            ast.unparse(base)
+                            if hasattr(ast, "unparse")
+                            else str(base.attr)
+                        )
+                        session.execute_write(
+                            add_inheritance, class_path, parent_name, file_path
+                        )
+                        print(f"Added inheritance: {node.name} -> {parent_name}")
+
+                # Add decorators
+                for decorator in node.decorator_list:
+                    decorator_name = (
+                        ast.unparse(decorator)
+                        if hasattr(ast, "unparse")
+                        else str(decorator)
+                    )
+                    session.execute_write(
+                        add_decorator, class_path, decorator_name, file_path
+                    )
+                    print(f"Added decorator: {decorator_name} on class {node.name}")
+
+                # Process class methods
+                for class_node in node.body:
+                    if isinstance(class_node, ast.FunctionDef):
+                        method_path = f"{class_path}::{class_node.name}"
+
+                        # Add method
+                        session.execute_write(
+                            add_method, class_node.name, class_path, file_path
+                        )
+                        print(f"Added method: {class_node.name} in class {node.name}")
+
+                        # Add method decorators
+                        for decorator in class_node.decorator_list:
+                            decorator_name = (
+                                ast.unparse(decorator)
+                                if hasattr(ast, "unparse")
+                                else str(decorator)
+                            )
+                            session.execute_write(
+                                add_decorator, method_path, decorator_name, file_path
+                            )
+                            print(
+                                f"Added decorator: {decorator_name} on method {class_node.name}"
+                            )
+
+                        # Extract function calls within method
+                        _extract_function_calls(
+                            class_node, method_path, file_path, session
+                        )
+
+                        # Extract variables within method
+                        _extract_variables(class_node, method_path, file_path, session)
+
+                    elif isinstance(class_node, ast.Assign):
+                        # Class attributes
+                        for target in class_node.targets:
+                            if isinstance(target, ast.Name):
+                                session.execute_write(
+                                    add_variable,
+                                    target.id,
+                                    class_path,
+                                    file_path,
+                                    "class_attribute",
+                                )
+                                print(
+                                    f"Added class attribute: {target.id} in {node.name}"
+                                )
+
+                current_class = None
+                current_class_path = None
+
+            elif isinstance(node, ast.FunctionDef):
+                func_path = f"{file_path}::{node.name}"
+
+                # Add function
+                session.execute_write(add_function, node.name, file_path)
+                session.execute_write(add_contains, file_path, func_path)
+                print(f"Added function: {node.name} in {file_path}")
+
+                # Add decorators
+                for decorator in node.decorator_list:
+                    decorator_name = (
+                        ast.unparse(decorator)
+                        if hasattr(ast, "unparse")
+                        else str(decorator)
+                    )
+                    session.execute_write(
+                        add_decorator, func_path, decorator_name, file_path
+                    )
+                    print(f"Added decorator: {decorator_name} on function {node.name}")
+
+                # Extract function calls within function
+                _extract_function_calls(node, func_path, file_path, session)
+
+                # Extract variables within function
+                _extract_variables(node, func_path, file_path, session)
+
+            elif isinstance(node, ast.Assign):
+                # Module-level variables
+                for target in node.targets:
+                    if isinstance(target, ast.Name):
+                        session.execute_write(
+                            add_variable,
+                            target.id,
+                            file_path,
+                            file_path,
+                            "module_variable",
+                        )
+                        print(f"Added module variable: {target.id} in {file_path}")
+
     except SyntaxError as e:
         print(f"Failed to parse {file_path}: {e}")
+
+
+def _extract_function_calls(func_node, func_path, file_path, session):
+    """Extract function calls from within a function or method."""
+    for node in ast.walk(func_node):
+        if isinstance(node, ast.Call):
+            if isinstance(node.func, ast.Name):
+                # Simple function call: func_name()
+                callee_name = node.func.id
+                session.execute_write(
+                    add_function_call, func_path, callee_name, file_path
+                )
+                print(f"Added function call: {func_path} -> {callee_name}")
+            elif isinstance(node.func, ast.Attribute):
+                # Method call: obj.method() or module.func()
+                callee_name = (
+                    ast.unparse(node.func)
+                    if hasattr(ast, "unparse")
+                    else f"{node.func.attr}"
+                )
+                session.execute_write(
+                    add_function_call, func_path, callee_name, file_path
+                )
+                print(f"Added method call: {func_path} -> {callee_name}")
+
+
+def _extract_variables(func_node, func_path, file_path, session):
+    """Extract variable assignments from within a function or method."""
+    for node in ast.walk(func_node):
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name):
+                    var_name = target.id
+                    session.execute_write(
+                        add_variable, var_name, func_path, file_path, "local_variable"
+                    )
+                    print(f"Added local variable: {var_name} in {func_path}")
+                elif isinstance(target, ast.Attribute):
+                    # Instance variables: self.var = value
+                    if isinstance(target.value, ast.Name) and target.value.id == "self":
+                        var_name = target.attr
+                        session.execute_write(
+                            add_variable,
+                            var_name,
+                            func_path,
+                            file_path,
+                            "instance_variable",
+                        )
+                        print(f"Added instance variable: {var_name} in {func_path}")
+        elif isinstance(node, ast.AnnAssign) and node.target:
+            # Type annotated assignments: var: int = 5
+            if isinstance(node.target, ast.Name):
+                var_name = node.target.id
+                session.execute_write(
+                    add_variable, var_name, func_path, file_path, "annotated_variable"
+                )
+                print(f"Added annotated variable: {var_name} in {func_path}")
 
 
 def process_repository():
@@ -542,6 +840,197 @@ def export_to_llm_readable_format(output_file):
                 f"- **Key insight**: Directory structure indicates logical grouping\n"
             )
 
+            # NEW: DETAILED RELATIONSHIP ANALYSIS
+            f.write("\n## Detailed Relationship Analysis\n\n")
+
+            # Import relationships
+            f.write("### Import Dependencies:\n")
+            import_relationships = session.run(
+                """
+                MATCH (f1:File)-[r:IMPORTS]->(f2:File)
+                RETURN f1.path as from_file, f2.path as to_file, r.name as import_name, r.type as import_type
+                ORDER BY from_file, to_file
+                """
+            ).data()
+
+            if import_relationships:
+                current_file = None
+                for import_rel in import_relationships:
+                    from_file = import_rel["from_file"]
+                    to_file = import_rel["to_file"]
+                    import_name = import_rel["import_name"]
+                    import_type = import_rel["import_type"]
+
+                    if from_file != current_file:
+                        current_file = from_file
+                        f.write(f"\n**{from_file}:**\n")
+
+                    f.write(
+                        f"  - imports `{import_name}` from {to_file} ({import_type})\n"
+                    )
+            else:
+                f.write("No import relationships detected.\n")
+
+            # Function call relationships
+            f.write("\n### Function Call Relationships:\n")
+            function_calls = session.run(
+                """
+                MATCH (caller)-[r:CALLS]->(call:FunctionCall)
+                RETURN caller.path as caller_path, r.function as callee_name, call.file as file_path
+                ORDER BY caller_path, callee_name
+                """
+            ).data()
+
+            if function_calls:
+                current_caller = None
+                for call_rel in function_calls:
+                    caller_path = call_rel["caller_path"]
+                    callee_name = call_rel["callee_name"]
+                    file_path = call_rel["file_path"]
+
+                    if caller_path != current_caller:
+                        current_caller = caller_path
+                        f.write(f"\n**{caller_path}:**\n")
+
+                    f.write(f"  - calls `{callee_name}()`\n")
+            else:
+                f.write("No function call relationships detected.\n")
+
+            # Class inheritance relationships
+            f.write("\n### Class Inheritance Hierarchy:\n")
+            inheritance_relationships = session.run(
+                """
+                MATCH (child:Class)-[:INHERITS]->(parent:Class)
+                RETURN child.name as child_name, child.file as child_file, 
+                       parent.name as parent_name, parent.file as parent_file
+                ORDER BY child_file, child_name
+                """
+            ).data()
+
+            if inheritance_relationships:
+                for inherit_rel in inheritance_relationships:
+                    child_name = inherit_rel["child_name"]
+                    child_file = inherit_rel["child_file"]
+                    parent_name = inherit_rel["parent_name"]
+                    parent_file = inherit_rel["parent_file"]
+                    f.write(
+                        f"- **{child_name}** ({child_file}) inherits from **{parent_name}** ({parent_file})\n"
+                    )
+            else:
+                f.write("No inheritance relationships detected.\n")
+
+            # Class methods relationships
+            f.write("\n### Class Methods:\n")
+            class_method_relationships = session.run(
+                """
+                MATCH (cls:Class)-[:HAS_METHOD]->(method:Method)
+                RETURN cls.name as class_name, cls.file as class_file, 
+                       collect(method.name) as methods
+                ORDER BY class_file, class_name
+                """
+            ).data()
+
+            if class_method_relationships:
+                for class_methods in class_method_relationships:
+                    class_name = class_methods["class_name"]
+                    class_file = class_methods["class_file"]
+                    methods = class_methods["methods"]
+                    f.write(f"\n**{class_name}** ({class_file}):\n")
+                    for method in methods:
+                        f.write(f"  - {method}()\n")
+            else:
+                f.write("No class method relationships detected.\n")
+
+            # Decorator relationships
+            f.write("\n### Decorators:\n")
+            decorator_relationships = session.run(
+                """
+                MATCH (decorated)-[:DECORATED_BY]->(decorator:Decorator)
+                RETURN decorated.path as decorated_path, decorator.name as decorator_name
+                ORDER BY decorated_path
+                """
+            ).data()
+
+            if decorator_relationships:
+                current_decorated = None
+                for decorator_rel in decorator_relationships:
+                    decorated_path = decorator_rel["decorated_path"]
+                    decorator_name = decorator_rel["decorator_name"]
+
+                    if decorated_path != current_decorated:
+                        current_decorated = decorated_path
+                        f.write(f"\n**{decorated_path}:**\n")
+
+                    f.write(f"  - @{decorator_name}\n")
+            else:
+                f.write("No decorator relationships detected.\n")
+
+            # Variable relationships
+            f.write("\n### Variables and Scope:\n")
+            variable_relationships = session.run(
+                """
+                MATCH (scope)-[:DEFINES]->(var:Variable)
+                RETURN scope.path as scope_path, var.name as var_name, var.type as var_type
+                ORDER BY scope_path, var_type, var_name
+                """
+            ).data()
+
+            if variable_relationships:
+                current_scope = None
+                for var_rel in variable_relationships:
+                    scope_path = var_rel["scope_path"]
+                    var_name = var_rel["var_name"]
+                    var_type = var_rel["var_type"]
+
+                    if scope_path != current_scope:
+                        current_scope = scope_path
+                        f.write(f"\n**{scope_path}:**\n")
+
+                    type_emoji = {
+                        "module_variable": "🌐",
+                        "class_attribute": "🏗️",
+                        "instance_variable": "🔧",
+                        "local_variable": "📍",
+                        "annotated_variable": "📝",
+                    }.get(var_type, "📄")
+
+                    f.write(f"  - {type_emoji} {var_name} ({var_type})\n")
+            else:
+                f.write("No variable relationships detected.\n")
+
+            # Relationship statistics
+            f.write("\n### Relationship Statistics:\n")
+
+            # Count different relationship types
+            relationship_stats = session.run(
+                """
+                MATCH ()-[r]->()
+                RETURN type(r) as relationship_type, count(r) as count
+                ORDER BY count DESC
+                """
+            ).data()
+
+            f.write("**Relationship counts by type:**\n")
+            for stat in relationship_stats:
+                rel_type = stat["relationship_type"]
+                count = stat["count"]
+                f.write(f"- {rel_type}: {count}\n")
+
+            # Total nodes by type
+            node_stats = session.run(
+                """
+                MATCH (n)
+                RETURN labels(n)[0] as node_type, count(n) as count
+                ORDER BY count DESC
+                """
+            ).data()
+
+            f.write("\n**Node counts by type:**\n")
+            for stat in node_stats:
+                node_type = stat["node_type"]
+                count = stat["count"]
+                f.write(f"- {node_type}: {count}\n")
+
             # NEW: API and Interface Patterns
             f.write("\n## API Patterns & Interfaces\n\n")
 
@@ -737,22 +1226,199 @@ def export_to_llm_readable_format(output_file):
             total_classes = session.run(
                 "MATCH (cls:Class) RETURN count(cls) as count"
             ).single()["count"]
+            total_methods = session.run(
+                "MATCH (method:Method) RETURN count(method) as count"
+            ).single()["count"]
+            total_imports = session.run(
+                "MATCH ()-[:IMPORTS]->() RETURN count(*) as count"
+            ).single()["count"]
+            total_function_calls = session.run(
+                "MATCH ()-[:CALLS]->() RETURN count(*) as count"
+            ).single()["count"]
+            total_inheritance = session.run(
+                "MATCH ()-[:INHERITS]->() RETURN count(*) as count"
+            ).single()["count"]
+            total_decorators = session.run(
+                "MATCH ()-[:DECORATED_BY]->() RETURN count(*) as count"
+            ).single()["count"]
+            total_variables = session.run(
+                "MATCH (var:Variable) RETURN count(var) as count"
+            ).single()["count"]
 
-            f.write(f"- Total files: {total_files}\n")
-            f.write(f"- Total functions: {total_functions}\n")
-            f.write(f"- Total classes: {total_classes}\n")
+            f.write(f"- **Total files**: {total_files}\n")
+            f.write(f"- **Total functions**: {total_functions}\n")
+            f.write(f"- **Total classes**: {total_classes}\n")
+            f.write(f"- **Total methods**: {total_methods}\n")
+            f.write(f"- **Total imports**: {total_imports}\n")
+            f.write(f"- **Total function calls**: {total_function_calls}\n")
+            f.write(f"- **Total inheritance relationships**: {total_inheritance}\n")
+            f.write(f"- **Total decorators**: {total_decorators}\n")
+            f.write(f"- **Total variables**: {total_variables}\n")
             f.write(
-                f"- Average functions per file: {total_functions/max(1, total_files):.1f}\n"
+                f"- **Average functions per file**: {total_functions/max(1, total_files):.1f}\n"
+            )
+            f.write(
+                f"- **Average methods per class**: {total_methods/max(1, total_classes):.1f}\n"
             )
 
+            f.write("\n### Relationship Density Analysis:\n")
+
+            # Calculate relationship density
+            if total_files > 0:
+                import_density = total_imports / total_files
+                call_density = total_function_calls / max(1, total_functions)
+                f.write(
+                    f"- **Import density**: {import_density:.2f} imports per file\n"
+                )
+                f.write(f"- **Call density**: {call_density:.2f} calls per function\n")
+
+                if total_classes > 0:
+                    inheritance_ratio = total_inheritance / total_classes
+                    f.write(
+                        f"- **Inheritance ratio**: {inheritance_ratio:.2f} inheritance relationships per class\n"
+                    )
+
+            f.write("\n### Code Architecture Insights:\n")
+
+            # Most connected files (by import relationships)
+            most_imported = session.run(
+                """
+                MATCH (f:File)<-[:IMPORTS]-()
+                RETURN f.path as file_path, count(*) as import_count
+                ORDER BY import_count DESC
+                LIMIT 3
+                """
+            ).data()
+
+            if most_imported:
+                f.write("**Most imported files (potential core modules):**\n")
+                for imported in most_imported:
+                    f.write(
+                        f"- {imported['file_path']} ({imported['import_count']} imports)\n"
+                    )
+
+            # Most complex functions (by call count)
+            most_calling = session.run(
+                """
+                MATCH (func)-[:CALLS]->()
+                RETURN func.path as func_path, count(*) as call_count
+                ORDER BY call_count DESC
+                LIMIT 3
+                """
+            ).data()
+
+            if most_calling:
+                f.write("\n**Most complex functions (by call count):**\n")
+                for calling in most_calling:
+                    f.write(
+                        f"- {calling['func_path']} ({calling['call_count']} calls)\n"
+                    )
+
+            # Classes with most methods
+            largest_classes = session.run(
+                """
+                MATCH (cls:Class)-[:HAS_METHOD]->()
+                RETURN cls.name as class_name, cls.file as class_file, count(*) as method_count
+                ORDER BY method_count DESC
+                LIMIT 3
+                """
+            ).data()
+
+            if largest_classes:
+                f.write("\n**Largest classes (by method count):**\n")
+                for large_class in largest_classes:
+                    f.write(
+                        f"- {large_class['class_name']} in {large_class['class_file']} ({large_class['method_count']} methods)\n"
+                    )
+
             f.write("\n### Recommended Starting Points for Code Analysis:\n")
-            f.write("1. Check configuration files for setup requirements\n")
-            f.write("2. Examine main.py or __init__.py files for entry points\n")
-            f.write("3. Review file contents and relationships for code structure\n")
-            f.write("4. Analyze API functions for external interfaces\n")
-            f.write("5. Study error handling patterns for robustness\n")
             f.write(
-                "6. Use directory-based organization to understand logical grouping\n"
+                "1. **Configuration files**: Check setup requirements and dependencies\n"
+            )
+            f.write("2. **Entry points**: Examine main.py or __init__.py files\n")
+            f.write(
+                "3. **Import graph**: Follow import relationships to understand module dependencies\n"
+            )
+            f.write(
+                "4. **Core classes**: Start with classes that have the most methods or inheritance\n"
+            )
+            f.write(
+                "5. **Function calls**: Trace call relationships to understand execution flow\n"
+            )
+            f.write(
+                "6. **API patterns**: Look for functions with API-like naming patterns\n"
+            )
+            f.write(
+                "7. **Error handling**: Study error handling patterns for robustness\n"
+            )
+            f.write(
+                "8. **Decorators**: Understand cross-cutting concerns through decorator usage\n"
+            )
+            f.write(
+                "9. **Variable scope**: Analyze variable definitions to understand data flow\n"
+            )
+            f.write(
+                "10. **Directory structure**: Use logical grouping to understand architecture\n"
+            )
+
+            f.write("\n### Neo4j Query Patterns for LLM Analysis:\n")
+            f.write("**Essential Cypher queries for code understanding:**\n\n")
+
+            f.write("```cypher\n")
+            f.write("// Find all functions in a specific file\n")
+            f.write(
+                "MATCH (f:File {path: 'your_file.py'})-[:CONTAINS]->(func:Function)\n"
+            )
+            f.write("RETURN func.name\n\n")
+
+            f.write("// Find all imports for a file\n")
+            f.write("MATCH (f:File {path: 'your_file.py'})-[r:IMPORTS]->(target)\n")
+            f.write("RETURN r.name, target.path, r.type\n\n")
+
+            f.write("// Find function call chain\n")
+            f.write("MATCH (func:Function)-[:CALLS*1..3]->(call)\n")
+            f.write("WHERE func.name = 'your_function'\n")
+            f.write("RETURN func.path, call.callee\n\n")
+
+            f.write("// Find class hierarchy\n")
+            f.write("MATCH (child:Class)-[:INHERITS*1..3]->(parent:Class)\n")
+            f.write("RETURN child.name, parent.name\n\n")
+
+            f.write("// Find all methods of a class\n")
+            f.write(
+                "MATCH (cls:Class {name: 'YourClass'})-[:HAS_METHOD]->(method:Method)\n"
+            )
+            f.write("RETURN method.name\n\n")
+
+            f.write("// Find variables in scope\n")
+            f.write("MATCH (scope)-[:DEFINES]->(var:Variable)\n")
+            f.write("WHERE scope.path CONTAINS 'your_function'\n")
+            f.write("RETURN var.name, var.type\n")
+            f.write("```\n")
+
+            f.write("\n### Integration with Neo4j MCP Server:\n")
+            f.write(
+                "This knowledge graph is optimized for use with Neo4j MCP (Model Context Protocol) servers.\n"
+            )
+            f.write("The rich relationship structure enables:\n\n")
+            f.write(
+                "- **Code navigation**: Follow relationships to understand code structure\n"
+            )
+            f.write(
+                "- **Impact analysis**: Find what depends on a specific function or class\n"
+            )
+            f.write(
+                "- **Refactoring support**: Identify all usages before making changes\n"
+            )
+            f.write(
+                "- **Architecture understanding**: Visualize module dependencies and call graphs\n"
+            )
+            f.write(
+                "- **Code generation**: Use patterns and relationships to generate similar code\n"
+            )
+            f.write("- **Bug hunting**: Trace execution paths and data flow\n")
+            f.write(
+                "- **Documentation**: Auto-generate documentation from relationships\n"
             )
 
 

@@ -51,7 +51,6 @@
 **codex-rs/mcp-types/generate_mcp_types.py:**
   - add_definition()
   - add_trait_impl()
-  - append()
   - capitalize()
   - check_string_list()
   - define_any_of()
@@ -130,7 +129,6 @@
   📄 Function: check_string_list
   📄 Function: type_from_ref
   📄 Function: emit_doc_comment
-  📄 Function: append
 
 **scripts/asciicheck.py:**
   📄 Function: main
@@ -145,7 +143,7 @@
 
 #### Functions by File:
 - **codex-cli/examples/prompt-analyzer/template/cluster_prompts.py**: parse_cli, _lazy_import_openai, embed_texts, load_or_create_embeddings, _lazy_import_sklearn_cluster, cluster_kmeans, cluster_dbscan, label_clusters, generate_markdown_report, create_plots, main
-- **codex-rs/mcp-types/generate_mcp_types.py**: main, add_definition, define_struct, infer_result_type, implements_request_trait, implements_notification_trait, add_trait_impl, define_string_enum, define_untagged_enum, define_any_of, get_serde_annotation_for_anyof_type, map_type, rust_prop_name, to_snake_case, capitalize, check_string_list, type_from_ref, emit_doc_comment, append
+- **codex-rs/mcp-types/generate_mcp_types.py**: main, add_definition, define_struct, infer_result_type, implements_request_trait, implements_notification_trait, add_trait_impl, define_string_enum, define_untagged_enum, define_any_of, get_serde_annotation_for_anyof_type, map_type, rust_prop_name, to_snake_case, capitalize, check_string_list, type_from_ref, emit_doc_comment
 - **scripts/asciicheck.py**: main, lint_utf8_ascii
 - **scripts/readme_toc.py**: main, generate_toc_lines, check_or_fix
 
@@ -158,7 +156,7 @@
   - codex-cli/examples/prompt-analyzer/template/cluster_prompts.py: 11 functions, 0 classes
 
 **📁 codex-rs/mcp-types/:**
-  - codex-rs/mcp-types/generate_mcp_types.py: 19 functions, 2 classes
+  - codex-rs/mcp-types/generate_mcp_types.py: 18 functions, 2 classes
 
 **📁 scripts/:**
   - scripts/readme_toc.py: 3 functions, 0 classes
@@ -174,20 +172,621 @@
 ### Code Element Relationships:
 #### Functions in Same Files (Potential Call Relationships):
 - **codex-cli/examples/prompt-analyzer/template/cluster_prompts.py**: main → create_plots → generate_markdown_report → label_clusters → cluster_dbscan...
-- **codex-rs/mcp-types/generate_mcp_types.py**: append → emit_doc_comment → type_from_ref → check_string_list → capitalize...
+- **codex-rs/mcp-types/generate_mcp_types.py**: emit_doc_comment → type_from_ref → check_string_list → capitalize → to_snake_case...
 - **scripts/asciicheck.py**: lint_utf8_ascii → main
 - **scripts/readme_toc.py**: check_or_fix → generate_toc_lines → check_or_fix → main → generate_toc_lines...
 
 #### Classes and Potential Methods:
-- **RustProp** (codex-rs/mcp-types/generate_mcp_types.py): append, emit_doc_comment, type_from_ref, check_string_list, capitalize...
-- **StructField** (codex-rs/mcp-types/generate_mcp_types.py): append, emit_doc_comment, type_from_ref, check_string_list, capitalize...
+- **RustProp** (codex-rs/mcp-types/generate_mcp_types.py): emit_doc_comment, type_from_ref, check_string_list, capitalize, to_snake_case...
+- **StructField** (codex-rs/mcp-types/generate_mcp_types.py): emit_doc_comment, type_from_ref, check_string_list, capitalize, to_snake_case...
 
 ### Relationship Summary for AI Agent:
-- **Total containment relationships**: 485
+- **Total containment relationships**: 484
 - **Files containing code elements**: 4
 - **Key insight**: Use file paths to understand module structure
 - **Key insight**: Functions in same file likely interact
 - **Key insight**: Directory structure indicates logical grouping
+
+## Detailed Relationship Analysis
+
+### Import Dependencies:
+No import relationships detected.
+
+### Function Call Relationships:
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::_lazy_import_openai:**
+  - calls `SystemExit()`
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::cluster_dbscan:**
+  - calls `DBSCAN()`
+  - calls `NearestNeighbors()`
+  - calls `StandardScaler()`
+  - calls `_lazy_import_sklearn_cluster()`
+  - calls `float()`
+  - calls `model.fit_predict()`
+  - calls `neigh.fit()`
+  - calls `neigh.kneighbors()`
+  - calls `np.percentile()`
+  - calls `print()`
+  - calls `scaler.fit_transform()`
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::cluster_kmeans:**
+  - calls `KMeans()`
+  - calls `RuntimeError()`
+  - calls `_lazy_import_sklearn_cluster()`
+  - calls `model.fit_predict()`
+  - calls `print()`
+  - calls `range()`
+  - calls `silhouette_score()`
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::create_plots:**
+  - calls `TSNE()`
+  - calls `for_devs.astype()`
+  - calls `len()`
+  - calls `min()`
+  - calls `np.argsort()`
+  - calls `np.unique()`
+  - calls `plots_dir.mkdir()`
+  - calls `plt.bar()`
+  - calls `plt.close()`
+  - calls `plt.figure()`
+  - calls `plt.legend()`
+  - calls `plt.savefig()`
+  - calls `plt.scatter()`
+  - calls `plt.tight_layout()`
+  - calls `plt.title()`
+  - calls `plt.xlabel()`
+  - calls `plt.xticks()`
+  - calls `plt.ylabel()`
+  - calls `plt.yticks()`
+  - calls `str()`
+  - calls `tsne.fit_transform()`
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::embed_texts:**
+  - calls `_lazy_import_openai()`
+  - calls `client.embeddings.create()`
+  - calls `embeddings.extend()`
+  - calls `len()`
+  - calls `openai.OpenAI()`
+  - calls `range()`
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::generate_markdown_report:**
+  - calls `'\n'.join()`
+  - calls `(labels == lbl).sum()`
+  - calls `df.loc[labels == -1, 'prompt'].sample()`
+  - calls `df.loc[labels == -1, 'prompt'].sample(min(10, counts[-1]), random_state=42).tolist()`
+  - calls `df.loc[labels == lbl, 'prompt'].sample()`
+  - calls `df.loc[labels == lbl, 'prompt'].sample(sample_n, random_state=42).tolist()`
+  - calls `int()`
+  - calls `len()`
+  - calls `lines.append()`
+  - calls `lines.extend()`
+  - calls `min()`
+  - calls `outputs.get()`
+  - calls `path_md.parent.mkdir()`
+  - calls `path_md.write_text()`
+  - calls `pd.Timestamp.now()`
+  - calls `set()`
+  - calls `sorted()`
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::label_clusters:**
+  - calls `'\n'.join()`
+  - calls `(labels == lbl).sum()`
+  - calls `ValueError()`
+  - calls `_lazy_import_openai()`
+  - calls `client.chat.completions.create()`
+  - calls `data.get()`
+  - calls `df.loc[labels == lbl, 'prompt'].sample()`
+  - calls `examples_series.tolist()`
+  - calls `json.loads()`
+  - calls `min()`
+  - calls `openai.OpenAI()`
+  - calls `print()`
+  - calls `reply.strip()`
+  - calls `reply_clean.find()`
+  - calls `reply_clean.rfind()`
+  - calls `resp.choices[0].message.content.strip()`
+  - calls `set()`
+  - calls `sorted()`
+  - calls `str()`
+  - calls `str(data.get('description', '')).strip()`
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::load_or_create_embeddings:**
+  - calls `cache.update()`
+  - calls `cache_path.exists()`
+  - calls `cache_path.parent.mkdir()`
+  - calls `cache_path.read_text()`
+  - calls `cache_path.write_text()`
+  - calls `dict()`
+  - calls `embed_texts()`
+  - calls `json.dumps()`
+  - calls `json.loads()`
+  - calls `len()`
+  - calls `missing_mask.any()`
+  - calls `np.array()`
+  - calls `pd.DataFrame()`
+  - calls `print()`
+  - calls `prompts.isin()`
+  - calls `prompts.map()`
+  - calls `prompts.map(cache.__getitem__).tolist()`
+  - calls `prompts[missing_mask].tolist()`
+  - calls `zip()`
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::main:**
+  - calls `KMeans()`
+  - calls `KMeans(n_clusters=best_k, random_state=42, n_init='auto').fit()`
+  - calls `SystemExit()`
+  - calls `cluster_dbscan()`
+  - calls `cluster_kmeans()`
+  - calls `create_plots()`
+  - calls `df.get()`
+  - calls `df.loc[ambiguous_mask, 'prompt'].tolist()`
+  - calls `embeddings_df.values.astype()`
+  - calls `generate_markdown_report()`
+  - calls `kmeans.transform()`
+  - calls `label_clusters()`
+  - calls `len()`
+  - calls `load_or_create_embeddings()`
+  - calls `np.sort()`
+  - calls `parse_cli()`
+  - calls `pd.read_csv()`
+  - calls `print()`
+  - calls `set()`
+  - calls `silhouette_score()`
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::parse_cli:**
+  - calls `Path()`
+  - calls `argparse.ArgumentParser()`
+  - calls `parser.add_argument()`
+  - calls `parser.parse_args()`
+
+**codex-rs/mcp-types/generate_mcp_types.py::StructField::append:**
+  - calls `out.append()`
+
+**codex-rs/mcp-types/generate_mcp_types.py::add_definition:**
+  - calls `ValueError()`
+  - calls `check_string_list()`
+  - calls `define_any_of()`
+  - calls `define_string_enum()`
+  - calls `define_struct()`
+  - calls `define_untagged_enum()`
+  - calls `definition.get()`
+  - calls `isinstance()`
+  - calls `json.dumps()`
+  - calls `json.loads()`
+  - calls `name.endswith()`
+  - calls `out.append()`
+  - calls `out.extend()`
+  - calls `set()`
+  - calls `type_from_ref()`
+
+**codex-rs/mcp-types/generate_mcp_types.py::add_trait_impl:**
+  - calls `field.append()`
+  - calls `infer_result_type()`
+  - calls `out.append()`
+  - calls `print()`
+
+**codex-rs/mcp-types/generate_mcp_types.py::capitalize:**
+  - calls `name[0].upper()`
+
+**codex-rs/mcp-types/generate_mcp_types.py::check_string_list:**
+  - calls `isinstance()`
+
+**codex-rs/mcp-types/generate_mcp_types.py::define_any_of:**
+  - calls `DEFINITIONS.get()`
+  - calls `emit_doc_comment()`
+  - calls `get_serde_annotation_for_anyof_type()`
+  - calls `isinstance()`
+  - calls `len()`
+  - calls `out.append()`
+  - calls `ref_name.startswith()`
+  - calls `request_def.get()`
+  - calls `request_def.get('properties', {}).get()`
+  - calls `request_def.get('properties', {}).get('method', {}).get()`
+  - calls `type_from_ref()`
+
+**codex-rs/mcp-types/generate_mcp_types.py::define_string_enum:**
+  - calls `capitalize()`
+  - calls `emit_doc_comment()`
+  - calls `isinstance()`
+  - calls `out.append()`
+
+**codex-rs/mcp-types/generate_mcp_types.py::define_struct:**
+  - calls `StructField()`
+  - calls `add_trait_impl()`
+  - calls `emit_doc_comment()`
+  - calls `extra_defs.clear()`
+  - calls `field.append()`
+  - calls `fields.append()`
+  - calls `implements_notification_trait()`
+  - calls `implements_request_trait()`
+  - calls `map_type()`
+  - calls `out.append()`
+  - calls `out.extend()`
+  - calls `prop_type.startswith()`
+  - calls `properties.items()`
+  - calls `rust_prop_name()`
+
+**codex-rs/mcp-types/generate_mcp_types.py::define_untagged_enum:**
+  - calls `ValueError()`
+  - calls `out.append()`
+
+**codex-rs/mcp-types/generate_mcp_types.py::emit_doc_comment:**
+  - calls `line.rstrip()`
+  - calls `out.append()`
+  - calls `text.strip()`
+  - calls `text.strip().split()`
+
+**codex-rs/mcp-types/generate_mcp_types.py::implements_notification_trait:**
+  - calls `name.endswith()`
+
+**codex-rs/mcp-types/generate_mcp_types.py::implements_request_trait:**
+  - calls `name.endswith()`
+
+**codex-rs/mcp-types/generate_mcp_types.py::infer_result_type:**
+  - calls `request_type_name.endswith()`
+
+**codex-rs/mcp-types/generate_mcp_types.py::main:**
+  - calls `Path()`
+  - calls `Path(__file__).resolve()`
+  - calls `add_definition()`
+  - calls `definitions.items()`
+  - calls `defn.get()`
+  - calls `defn.get('properties', {}).get()`
+  - calls `defn.get('properties', {}).get('method', {}).get()`
+  - calls `f.write()`
+  - calls `json.load()`
+  - calls `len()`
+  - calls `n_def.get()`
+  - calls `n_def.get('properties', {}).get()`
+  - calls `n_def.get('properties', {}).get('method', {}).get()`
+  - calls `notif_impl_lines.append()`
+  - calls `open()`
+  - calls `out.extend()`
+  - calls `print()`
+  - calls `schema_file.open()`
+  - calls `subprocess.check_call()`
+  - calls `try_from_impl_lines.append()`
+
+**codex-rs/mcp-types/generate_mcp_types.py::map_type:**
+  - calls `ValueError()`
+  - calls `capitalize()`
+  - calls `define_any_of()`
+  - calls `define_struct()`
+  - calls `extra_defs.extend()`
+  - calls `isinstance()`
+  - calls `map_type()`
+  - calls `set()`
+  - calls `type_from_ref()`
+  - calls `typedef.get()`
+
+**codex-rs/mcp-types/generate_mcp_types.py::rust_prop_name:**
+  - calls `', '.join()`
+  - calls `RustProp()`
+  - calls `serde_annotations.append()`
+  - calls `to_snake_case()`
+
+**codex-rs/mcp-types/generate_mcp_types.py::to_snake_case:**
+  - calls `''.join()`
+  - calls `c.isupper()`
+  - calls `c.lower()`
+  - calls `name[0].lower()`
+
+**codex-rs/mcp-types/generate_mcp_types.py::type_from_ref:**
+  - calls `ref.split()`
+  - calls `ref.startswith()`
+
+**scripts/asciicheck.py::lint_utf8_ascii:**
+  - calls `bool()`
+  - calls `enumerate()`
+  - calls `errors.append()`
+  - calls `f.read()`
+  - calls `f.write()`
+  - calls `len()`
+  - calls `open()`
+  - calls `ord()`
+  - calls `partial.count()`
+  - calls `partial.rfind()`
+  - calls `print()`
+  - calls `raw.decode()`
+  - calls `repr()`
+  - calls `text.splitlines()`
+
+**scripts/asciicheck.py::main:**
+  - calls `Path()`
+  - calls `argparse.ArgumentParser()`
+  - calls `lint_utf8_ascii()`
+  - calls `parser.add_argument()`
+  - calls `parser.parse_args()`
+
+**scripts/readme_toc.py::check_or_fix:**
+  - calls `'\n'.join()`
+  - calls `content.splitlines()`
+  - calls `difflib.unified_diff()`
+  - calls `enumerate()`
+  - calls `generate_toc_lines()`
+  - calls `l.lstrip()`
+  - calls `l.lstrip().startswith()`
+  - calls `l.strip()`
+  - calls `next()`
+  - calls `print()`
+  - calls `readme_path.is_file()`
+  - calls `readme_path.read_text()`
+  - calls `readme_path.write_text()`
+
+**scripts/readme_toc.py::generate_toc_lines:**
+  - calls `content.splitlines()`
+  - calls `headings.append()`
+  - calls `len()`
+  - calls `line.strip()`
+  - calls `line.strip().startswith()`
+  - calls `m.group()`
+  - calls `m.group(2).strip()`
+  - calls `re.match()`
+  - calls `re.sub()`
+  - calls `slug.replace()`
+  - calls `slug.replace('‑', '-').replace()`
+  - calls `slug.replace('‑', '-').replace('–', '-').replace()`
+  - calls `slug.strip()`
+  - calls `slug.strip().replace()`
+  - calls `text.lower()`
+  - calls `toc.append()`
+
+**scripts/readme_toc.py::main:**
+  - calls `Path()`
+  - calls `argparse.ArgumentParser()`
+  - calls `check_or_fix()`
+  - calls `parser.add_argument()`
+  - calls `parser.parse_args()`
+
+### Class Inheritance Hierarchy:
+No inheritance relationships detected.
+
+### Class Methods:
+
+**StructField** (codex-rs/mcp-types/generate_mcp_types.py):
+  - append()
+
+### Decorators:
+
+**codex-rs/mcp-types/generate_mcp_types.py::RustProp:**
+  - @dataclass
+
+**codex-rs/mcp-types/generate_mcp_types.py::StructField:**
+  - @dataclass
+
+### Variables and Scope:
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::cluster_dbscan:**
+  - 📍 eps (local_variable)
+  - 📍 kth_distances (local_variable)
+  - 📍 matrix_scaled (local_variable)
+  - 📍 model (local_variable)
+  - 📍 neigh (local_variable)
+  - 📍 scaler (local_variable)
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::cluster_kmeans:**
+  - 📍 best_k (local_variable)
+  - 📍 best_labels (local_variable)
+  - 📍 best_score (local_variable)
+  - 📍 labels (local_variable)
+  - 📍 model (local_variable)
+  - 📍 score (local_variable)
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::create_plots:**
+  - 📍 bar_path (local_variable)
+  - 📍 dev_mask (local_variable)
+  - 📍 order (local_variable)
+  - 📍 scatter (local_variable)
+  - 📍 tsne (local_variable)
+  - 📍 tsne_path (local_variable)
+  - 📍 xy (local_variable)
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::embed_texts:**
+  - 📝 embeddings (annotated_variable)
+  - 📍 batch (local_variable)
+  - 📍 client (local_variable)
+  - 📍 openai (local_variable)
+  - 📍 response (local_variable)
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::generate_markdown_report:**
+  - 📝 lines (annotated_variable)
+  - 📍 ambiguous (local_variable)
+  - 📍 cluster_ids (local_variable)
+  - 📍 counts (local_variable)
+  - 📍 examples (local_variable)
+  - 📍 meta_lbl (local_variable)
+  - 📍 num_clusters (local_variable)
+  - 📍 sample_n (local_variable)
+  - 📍 total (local_variable)
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::label_clusters:**
+  - 📝 out (annotated_variable)
+  - 📍 client (local_variable)
+  - 📍 data (local_variable)
+  - 📍 examples (local_variable)
+  - 📍 examples_series (local_variable)
+  - 📍 json_str (local_variable)
+  - 📍 m_end (local_variable)
+  - 📍 m_start (local_variable)
+  - 📍 messages (local_variable)
+  - 📍 openai (local_variable)
+  - 📍 reply (local_variable)
+  - 📍 reply_clean (local_variable)
+  - 📍 resp (local_variable)
+  - 📍 user_content (local_variable)
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::load_or_create_embeddings:**
+  - 📍 cache (local_variable)
+  - 📍 mat (local_variable)
+  - 📍 missing_mask (local_variable)
+  - 📍 new_embeddings (local_variable)
+  - 📍 texts_to_embed (local_variable)
+  - 📍 vectors (local_variable)
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::main:**
+  - 📝 outputs (annotated_variable)
+  - 📍 ambiguous_mask (local_variable)
+  - 📍 args (local_variable)
+  - 📍 best_k (local_variable)
+  - 📍 df (local_variable)
+  - 📍 distances (local_variable)
+  - 📍 embeddings_df (local_variable)
+  - 📍 kmeans (local_variable)
+  - 📍 labels (local_variable)
+  - 📍 mat (local_variable)
+  - 📍 meta (local_variable)
+  - 📍 ratio (local_variable)
+  - 📍 sorted_dist (local_variable)
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::parse_cli:**
+  - 📍 parser (local_variable)
+
+**codex-rs/mcp-types/generate_mcp_types.py:**
+  - 🌐 JSONRPC_VERSION (module_variable)
+  - 🌐 SCHEMA_VERSION (module_variable)
+  - 🌐 STANDARD_DERIVE (module_variable)
+  - 🌐 extra_defs (module_variable)
+
+**codex-rs/mcp-types/generate_mcp_types.py::add_definition:**
+  - 📍 any_of (local_variable)
+  - 📍 deep_copied_any_of (local_variable)
+  - 📍 description (local_variable)
+  - 📍 enum_values (local_variable)
+  - 📍 item_name (local_variable)
+  - 📍 properties (local_variable)
+  - 📍 ref (local_variable)
+  - 📍 ref_prop (local_variable)
+  - 📍 required_props (local_variable)
+  - 📍 type_prop (local_variable)
+
+**codex-rs/mcp-types/generate_mcp_types.py::add_trait_impl:**
+  - 📍 result_type (local_variable)
+
+**codex-rs/mcp-types/generate_mcp_types.py::define_any_of:**
+  - 📝 out (annotated_variable)
+  - 📍 CLIENT_REQUEST_TYPE_NAMES (local_variable)
+  - 📍 SERVER_NOTIFICATION_TYPE_NAMES (local_variable)
+  - 📍 method_const (local_variable)
+  - 📍 payload_type (local_variable)
+  - 📍 ref_name (local_variable)
+  - 📍 refs (local_variable)
+  - 📍 request_def (local_variable)
+  - 📍 variant_name (local_variable)
+
+**codex-rs/mcp-types/generate_mcp_types.py::define_struct:**
+  - 📝 fields (annotated_variable)
+  - 📝 out (annotated_variable)
+  - 📍 is_optional (local_variable)
+  - 📍 prop_type (local_variable)
+  - 📍 rs_prop (local_variable)
+
+**codex-rs/mcp-types/generate_mcp_types.py::infer_result_type:**
+  - 📍 candidate (local_variable)
+
+**codex-rs/mcp-types/generate_mcp_types.py::main:**
+  - 📝 notif_impl_lines (annotated_variable)
+  - 📝 try_from_impl_lines (annotated_variable)
+  - 📍 DEFINITIONS (local_variable)
+  - 📍 definitions (local_variable)
+  - 📍 defn (local_variable)
+  - 📍 lib_rs (local_variable)
+  - 📍 method_const (local_variable)
+  - 📍 n_def (local_variable)
+  - 📍 num_args (local_variable)
+  - 📍 out (local_variable)
+  - 📍 payload_type (local_variable)
+  - 📍 schema_file (local_variable)
+  - 📍 schema_json (local_variable)
+
+**codex-rs/mcp-types/generate_mcp_types.py::map_type:**
+  - 📍 any_of (local_variable)
+  - 📍 custom_type (local_variable)
+  - 📍 item_type (local_variable)
+  - 📍 ref_prop (local_variable)
+  - 📍 type_prop (local_variable)
+
+**codex-rs/mcp-types/generate_mcp_types.py::rust_prop_name:**
+  - 📍 is_rename (local_variable)
+  - 📍 prop_name (local_variable)
+  - 📍 serde_annotations (local_variable)
+  - 📍 serde_str (local_variable)
+
+**codex-rs/mcp-types/generate_mcp_types.py::to_snake_case:**
+  - 📍 snake_case (local_variable)
+
+**scripts/asciicheck.py:**
+  - 🌐 allowed_unicode_codepoints (module_variable)
+
+**scripts/asciicheck.py::lint_utf8_ascii:**
+  - 📍 codepoint (local_variable)
+  - 📍 col (local_variable)
+  - 📍 errors (local_variable)
+  - 📍 line (local_variable)
+  - 📍 new_contents (local_variable)
+  - 📍 num_replacements (local_variable)
+  - 📍 partial (local_variable)
+  - 📍 raw (local_variable)
+  - 📍 safe_char (local_variable)
+  - 📍 text (local_variable)
+
+**scripts/asciicheck.py::main:**
+  - 📍 args (local_variable)
+  - 📍 has_errors (local_variable)
+  - 📍 parser (local_variable)
+  - 📍 path (local_variable)
+
+**scripts/readme_toc.py::check_or_fix:**
+  - 📍 begin_idx (local_variable)
+  - 📍 content (local_variable)
+  - 📍 current (local_variable)
+  - 📍 current_block (local_variable)
+  - 📍 diff (local_variable)
+  - 📍 end_idx (local_variable)
+  - 📍 expected (local_variable)
+  - 📍 lines (local_variable)
+  - 📍 new_lines (local_variable)
+  - 📍 prefix (local_variable)
+  - 📍 suffix (local_variable)
+
+**scripts/readme_toc.py::generate_toc_lines:**
+  - 📍 headings (local_variable)
+  - 📍 in_code (local_variable)
+  - 📍 indent (local_variable)
+  - 📍 level (local_variable)
+  - 📍 lines (local_variable)
+  - 📍 m (local_variable)
+  - 📍 slug (local_variable)
+  - 📍 text (local_variable)
+  - 📍 toc (local_variable)
+
+**scripts/readme_toc.py::main:**
+  - 📍 args (local_variable)
+  - 📍 parser (local_variable)
+  - 📍 path (local_variable)
+
+### Relationship Statistics:
+**Relationship counts by type:**
+- CONTAINS: 484
+- CALLS: 279
+- DEFINES: 158
+- MODIFIED: 76
+- AUTHORED: 10
+- DECORATED_BY: 2
+- HAS_METHOD: 1
+
+**Node counts by type:**
+- File: 396
+- FunctionCall: 279
+- Variable: 158
+- Directory: 77
+- Function: 34
+- Import: 33
+- Commit: 10
+- Class: 2
+- Decorator: 1
+- Method: 1
+- Author: 1
 
 ## API Patterns & Interfaces
 
@@ -288,7 +887,7 @@ Most frequently modified Python files:
 - Text: 2 files
 
 ### Code Complexity (Top 10 files by function/class count):
-- codex-rs/mcp-types/generate_mcp_types.py: 19 functions, 2 classes
+- codex-rs/mcp-types/generate_mcp_types.py: 18 functions, 2 classes
 - codex-cli/examples/prompt-analyzer/template/cluster_prompts.py: 11 functions, 0 classes
 - scripts/readme_toc.py: 3 functions, 0 classes
 - scripts/asciicheck.py: 2 functions, 0 classes
@@ -296,15 +895,84 @@ Most frequently modified Python files:
 ## AI Agent Summary
 
 ### Key Insights for Code Understanding:
-- Total files: 396
-- Total functions: 35
-- Total classes: 2
-- Average functions per file: 0.1
+- **Total files**: 396
+- **Total functions**: 34
+- **Total classes**: 2
+- **Total methods**: 1
+- **Total imports**: 0
+- **Total function calls**: 279
+- **Total inheritance relationships**: 0
+- **Total decorators**: 2
+- **Total variables**: 158
+- **Average functions per file**: 0.1
+- **Average methods per class**: 0.5
+
+### Relationship Density Analysis:
+- **Import density**: 0.00 imports per file
+- **Call density**: 8.21 calls per function
+- **Inheritance ratio**: 0.00 inheritance relationships per class
+
+### Code Architecture Insights:
+
+**Most complex functions (by call count):**
+- codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::create_plots (21 calls)
+- codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::label_clusters (20 calls)
+- codex-cli/examples/prompt-analyzer/template/cluster_prompts.py::main (20 calls)
+
+**Largest classes (by method count):**
+- StructField in codex-rs/mcp-types/generate_mcp_types.py (1 methods)
 
 ### Recommended Starting Points for Code Analysis:
-1. Check configuration files for setup requirements
-2. Examine main.py or __init__.py files for entry points
-3. Review file contents and relationships for code structure
-4. Analyze API functions for external interfaces
-5. Study error handling patterns for robustness
-6. Use directory-based organization to understand logical grouping
+1. **Configuration files**: Check setup requirements and dependencies
+2. **Entry points**: Examine main.py or __init__.py files
+3. **Import graph**: Follow import relationships to understand module dependencies
+4. **Core classes**: Start with classes that have the most methods or inheritance
+5. **Function calls**: Trace call relationships to understand execution flow
+6. **API patterns**: Look for functions with API-like naming patterns
+7. **Error handling**: Study error handling patterns for robustness
+8. **Decorators**: Understand cross-cutting concerns through decorator usage
+9. **Variable scope**: Analyze variable definitions to understand data flow
+10. **Directory structure**: Use logical grouping to understand architecture
+
+### Neo4j Query Patterns for LLM Analysis:
+**Essential Cypher queries for code understanding:**
+
+```cypher
+// Find all functions in a specific file
+MATCH (f:File {path: 'your_file.py'})-[:CONTAINS]->(func:Function)
+RETURN func.name
+
+// Find all imports for a file
+MATCH (f:File {path: 'your_file.py'})-[r:IMPORTS]->(target)
+RETURN r.name, target.path, r.type
+
+// Find function call chain
+MATCH (func:Function)-[:CALLS*1..3]->(call)
+WHERE func.name = 'your_function'
+RETURN func.path, call.callee
+
+// Find class hierarchy
+MATCH (child:Class)-[:INHERITS*1..3]->(parent:Class)
+RETURN child.name, parent.name
+
+// Find all methods of a class
+MATCH (cls:Class {name: 'YourClass'})-[:HAS_METHOD]->(method:Method)
+RETURN method.name
+
+// Find variables in scope
+MATCH (scope)-[:DEFINES]->(var:Variable)
+WHERE scope.path CONTAINS 'your_function'
+RETURN var.name, var.type
+```
+
+### Integration with Neo4j MCP Server:
+This knowledge graph is optimized for use with Neo4j MCP (Model Context Protocol) servers.
+The rich relationship structure enables:
+
+- **Code navigation**: Follow relationships to understand code structure
+- **Impact analysis**: Find what depends on a specific function or class
+- **Refactoring support**: Identify all usages before making changes
+- **Architecture understanding**: Visualize module dependencies and call graphs
+- **Code generation**: Use patterns and relationships to generate similar code
+- **Bug hunting**: Trace execution paths and data flow
+- **Documentation**: Auto-generate documentation from relationships
