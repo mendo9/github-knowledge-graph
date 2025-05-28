@@ -1,0 +1,310 @@
+# Repository Knowledge Graph
+# Optimized for AI Coding Agent Analysis
+
+## Project Overview
+
+### Configuration & Entry Points:
+- .github/dotslash-config.json
+- codex-cli/package.json
+- codex-cli/tsconfig.json
+- package.json
+
+### Key Directories:
+- .husky
+- codex-cli
+- codex-cli/bin
+- codex-cli/examples
+- codex-cli/examples/build-codex-demo
+- codex-cli/examples/build-codex-demo/runs
+- codex-cli/examples/camerascii
+- codex-cli/examples/camerascii/runs
+- codex-cli/examples/camerascii/template
+- codex-cli/examples/impossible-pong
+- codex-cli/examples/impossible-pong/runs
+- codex-cli/examples/impossible-pong/template
+- codex-cli/examples/prompt-analyzer
+- codex-cli/examples/prompt-analyzer/runs
+- codex-cli/examples/prompt-analyzer/template
+- codex-cli/examples/prompt-analyzer/template/plots
+- codex-cli/examples/prompt-analyzer/template/plots_dbscan
+- codex-cli/scripts
+- codex-cli/src
+- codex-cli/src/components
+
+## Code Architecture
+
+### Functions & Methods:
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py:**
+  - _lazy_import_openai()
+  - _lazy_import_sklearn_cluster()
+  - cluster_dbscan()
+  - cluster_kmeans()
+  - create_plots()
+  - embed_texts()
+  - generate_markdown_report()
+  - label_clusters()
+  - load_or_create_embeddings()
+  - main()
+  - parse_cli()
+
+**codex-rs/mcp-types/generate_mcp_types.py:**
+  - add_definition()
+  - add_trait_impl()
+  - append()
+  - capitalize()
+  - check_string_list()
+  - define_any_of()
+  - define_string_enum()
+  - define_struct()
+  - define_untagged_enum()
+  - emit_doc_comment()
+  - get_serde_annotation_for_anyof_type()
+  - implements_notification_trait()
+  - implements_request_trait()
+  - infer_result_type()
+  - main()
+  - map_type()
+  - rust_prop_name()
+  - to_snake_case()
+  - type_from_ref()
+
+**scripts/asciicheck.py:**
+  - lint_utf8_ascii()
+  - main()
+
+**scripts/readme_toc.py:**
+  - check_or_fix()
+  - generate_toc_lines()
+  - main()
+
+### Classes & Objects:
+
+**codex-rs/mcp-types/generate_mcp_types.py:**
+  - class RustProp
+  - class StructField
+
+## Dependencies & Import Graph
+
+### Python Module Structure:
+- codex-cli.examples.prompt-analyzer.template.cluster_prompts (codex-cli/examples/prompt-analyzer/template/cluster_prompts.py)
+- codex-rs.mcp-types.generate_mcp_types (codex-rs/mcp-types/generate_mcp_types.py)
+- scripts.asciicheck (scripts/asciicheck.py)
+- scripts.readme_toc (scripts/readme_toc.py)
+
+## Code Relationships & Dependencies
+
+### File Contents (What's defined where):
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py:**
+  📄 Function: parse_cli
+  📄 Function: _lazy_import_openai
+  📄 Function: embed_texts
+  📄 Function: load_or_create_embeddings
+  📄 Function: _lazy_import_sklearn_cluster
+  📄 Function: cluster_kmeans
+  📄 Function: cluster_dbscan
+  📄 Function: label_clusters
+  📄 Function: generate_markdown_report
+  📄 Function: create_plots
+  📄 Function: main
+
+**codex-rs/mcp-types/generate_mcp_types.py:**
+  📄 Function: main
+  📄 Function: add_definition
+  🏗️  Class: StructField
+  📄 Function: define_struct
+  📄 Function: infer_result_type
+  📄 Function: implements_request_trait
+  📄 Function: implements_notification_trait
+  📄 Function: add_trait_impl
+  📄 Function: define_string_enum
+  📄 Function: define_untagged_enum
+  📄 Function: define_any_of
+  📄 Function: get_serde_annotation_for_anyof_type
+  📄 Function: map_type
+  🏗️  Class: RustProp
+  📄 Function: rust_prop_name
+  📄 Function: to_snake_case
+  📄 Function: capitalize
+  📄 Function: check_string_list
+  📄 Function: type_from_ref
+  📄 Function: emit_doc_comment
+  📄 Function: append
+
+**scripts/asciicheck.py:**
+  📄 Function: main
+  📄 Function: lint_utf8_ascii
+
+**scripts/readme_toc.py:**
+  📄 Function: main
+  📄 Function: generate_toc_lines
+  📄 Function: check_or_fix
+
+### Code Element Locations (Where to find things):
+
+#### Functions by File:
+- **codex-cli/examples/prompt-analyzer/template/cluster_prompts.py**: parse_cli, _lazy_import_openai, embed_texts, load_or_create_embeddings, _lazy_import_sklearn_cluster, cluster_kmeans, cluster_dbscan, label_clusters, generate_markdown_report, create_plots, main
+- **codex-rs/mcp-types/generate_mcp_types.py**: main, add_definition, define_struct, infer_result_type, implements_request_trait, implements_notification_trait, add_trait_impl, define_string_enum, define_untagged_enum, define_any_of, get_serde_annotation_for_anyof_type, map_type, rust_prop_name, to_snake_case, capitalize, check_string_list, type_from_ref, emit_doc_comment, append
+- **scripts/asciicheck.py**: main, lint_utf8_ascii
+- **scripts/readme_toc.py**: main, generate_toc_lines, check_or_fix
+
+#### Classes by File:
+- **codex-rs/mcp-types/generate_mcp_types.py**: StructField, RustProp
+
+### Directory-based Code Organization:
+
+**📁 codex-cli/examples/prompt-analyzer/template/:**
+  - codex-cli/examples/prompt-analyzer/template/cluster_prompts.py: 11 functions, 0 classes
+
+**📁 codex-rs/mcp-types/:**
+  - codex-rs/mcp-types/generate_mcp_types.py: 19 functions, 2 classes
+
+**📁 scripts/:**
+  - scripts/readme_toc.py: 3 functions, 0 classes
+  - scripts/asciicheck.py: 2 functions, 0 classes
+
+### Potential Cross-File Dependencies:
+*Note: Based on naming patterns and file structure analysis*
+
+#### Likely Import Relationships:
+- scripts/asciicheck.py ↔️ scripts/readme_toc.py
+- scripts/readme_toc.py ↔️ scripts/asciicheck.py
+
+### Code Element Relationships:
+#### Functions in Same Files (Potential Call Relationships):
+- **codex-cli/examples/prompt-analyzer/template/cluster_prompts.py**: main → create_plots → generate_markdown_report → label_clusters → cluster_dbscan...
+- **codex-rs/mcp-types/generate_mcp_types.py**: append → emit_doc_comment → type_from_ref → check_string_list → capitalize...
+- **scripts/asciicheck.py**: lint_utf8_ascii → main
+- **scripts/readme_toc.py**: check_or_fix → generate_toc_lines → check_or_fix → main → generate_toc_lines...
+
+#### Classes and Potential Methods:
+- **RustProp** (codex-rs/mcp-types/generate_mcp_types.py): append, emit_doc_comment, type_from_ref, check_string_list, capitalize...
+- **StructField** (codex-rs/mcp-types/generate_mcp_types.py): append, emit_doc_comment, type_from_ref, check_string_list, capitalize...
+
+### Relationship Summary for AI Agent:
+- **Total containment relationships**: 485
+- **Files containing code elements**: 4
+- **Key insight**: Use file paths to understand module structure
+- **Key insight**: Functions in same file likely interact
+- **Key insight**: Directory structure indicates logical grouping
+
+## API Patterns & Interfaces
+
+### Potential API Functions:
+
+**codex-rs/mcp-types/generate_mcp_types.py:**
+  - get_serde_annotation_for_anyof_type()
+
+### Database & External Connections:
+
+**codex-cli/examples/prompt-analyzer/template/cluster_prompts.py:**
+  - cluster_dbscan()
+
+## Error Handling & Critical Functions
+
+### Error Handling Functions:
+
+**codex-rs/mcp-types/generate_mcp_types.py:**
+  - check_string_list()
+
+**scripts/readme_toc.py:**
+  - check_or_fix()
+
+## Recent Development Activity
+
+### Last 5 Commits:
+- 2025-05-27T23:11:44-07:00: feat: add support for -c/--config to override individual config items (#1137)
+
+This PR introduces support for `-c`/`--config` so users can override
+individual config values on the command line using `--config
+name=value`. Example:
+
+```
+codex --config model=o4-mini
+```
+
+Making it possible to set arbitrary config values on the command line
+results in a more flexible configuration scheme and makes it easier to
+provide single-line examples that can be copy-pasted from documentation.
+
+Effectively, it means there are four levels of configuration for some
+values:
+
+- Default value (e.g., `model` currently defaults to `o4-mini`)
+- Value in `config.toml` (e.g., user could override the default to be
+`model = "o3"` in their `config.toml`)
+- Specifying `-c` or `--config` to override `model` (e.g., user can
+include `-c model=o3` in their list of args to Codex)
+- If available, a config-specific flag can be used, which takes
+precedence over `-c` (e.g., user can specify `--model o3` in their list
+of args to Codex)
+
+Now that it is possible to specify anything that could be configured in
+`config.toml` on the command line using `-c`, we do not need to have a
+custom flag for every possible config option (which can clutter the
+output of `--help`). To that end, as part of this PR, we drop support
+for the `--disable-response-storage` flag, as users can now specify `-c
+disable_response_storage=true` to get the equivalent functionality.
+
+Under the hood, this works by loading the `config.toml` into a
+`toml::Value`. Then for each `key=value`, we create a small synthetic
+TOML file with `value` so that we can run the TOML parser to get the
+equivalent `toml::Value`. We then parse `key` to determine the point in
+the original `toml::Value` to do the insert/replace. Once all of the
+overrides from `-c` args have been applied, the `toml::Value` is
+deserialized into a `ConfigToml` and then the `ConfigOverrides` are
+applied, as before.
+- 2025-05-27T10:06:41-07:00: fix: update install_native_deps.sh to pick up the latest release (#1136)
+- 2025-05-27T09:12:55-07:00: fix: use o4-mini as the default model (#1135)
+
+Rollback of https://github.com/openai/codex/pull/972.
+- 2025-05-24T08:33:49-07:00: fix: TUI was not honoring --skip-git-repo-check correctly (#1105)
+
+I discovered that if I ran `codex <PROMPT>` in a cwd that was not a Git
+repo, Codex did not automatically run `<PROMPT>` after I accepted the
+Git warning. It appears that we were not managing the `AppState`
+transition correctly, so this fixes the bug and ensures the Codex
+session does not start until the user accepts the Git warning.
+
+In particular, we now create the `ChatWidget` lazily and store it in the
+`AppState::Chat` variant.
+- 2025-05-23T11:53:13-07:00: fix: forgot to pass codex_linux_sandbox_exe through in cli/src/debug_sandbox.rs (#1095)
+
+I accidentally missed this in https://github.com/openai/codex/pull/1086.
+
+### Development Hotspots:
+Most frequently modified Python files:
+
+## Codebase Metrics
+
+### File Types:
+- Other: 339 files
+- Markdown: 21 files
+- YAML: 13 files
+- JavaScript: 12 files
+- JSON: 5 files
+- Python: 4 files
+- Text: 2 files
+
+### Code Complexity (Top 10 files by function/class count):
+- codex-rs/mcp-types/generate_mcp_types.py: 19 functions, 2 classes
+- codex-cli/examples/prompt-analyzer/template/cluster_prompts.py: 11 functions, 0 classes
+- scripts/readme_toc.py: 3 functions, 0 classes
+- scripts/asciicheck.py: 2 functions, 0 classes
+
+## AI Agent Summary
+
+### Key Insights for Code Understanding:
+- Total files: 396
+- Total functions: 35
+- Total classes: 2
+- Average functions per file: 0.1
+
+### Recommended Starting Points for Code Analysis:
+1. Check configuration files for setup requirements
+2. Examine main.py or __init__.py files for entry points
+3. Review file contents and relationships for code structure
+4. Analyze API functions for external interfaces
+5. Study error handling patterns for robustness
+6. Use directory-based organization to understand logical grouping
